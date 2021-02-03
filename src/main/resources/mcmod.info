@@ -1,0 +1,16 @@
+[
+{
+  "modid": "sbb",
+  "name": "SkyBlockBonus",
+  "description": "",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["TGMDevelopment"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

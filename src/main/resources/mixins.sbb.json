@@ -1,0 +1,13 @@
+{
+  "package": "ga.matthewtgm.skyblockmod.mixins",
+  "required": true,
+  "compatibilityLevel": "JAVA_8",
+  "verbose": true,
+  "refmap": "mixins.sbb.refmap.json",
+  "mixins": [
+    "client.MinecraftMixin"
+  ],
+  "client": [
+    "client.MinecraftMixin"
+  ]
+}
