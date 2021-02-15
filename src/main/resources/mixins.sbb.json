@@ -5,9 +5,11 @@
   "verbose": true,
   "refmap": "mixins.sbb.refmap.json",
   "mixins": [
-    "client.MinecraftMixin"
+    "client.MinecraftMixin",
+    "networking.NetworkManagerMixin"
   ],
   "client": [
-    "client.MinecraftMixin"
+    "client.MinecraftMixin",
+    "networking.NetworkManagerMixin"
   ]
 }

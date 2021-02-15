@@ -1,15 +1,12 @@
 package ga.matthewtgm.skyblockmod.features;
 
 import ga.matthewtgm.json.files.JsonReader;
-import ga.matthewtgm.json.files.JsonWriter;
 import ga.matthewtgm.json.objects.JsonObject;
 import ga.matthewtgm.lib.util.LoggingUtils;
 import ga.matthewtgm.skyblockmod.Constants;
 import ga.matthewtgm.skyblockmod.SkyBlockBonus;
-import ga.matthewtgm.skyblockmod.utils.FeatureUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.util.Random;
@@ -19,37 +16,38 @@ public abstract class Feature {
     //FEATURE INFORMATION
     private final String name;
     private final String registryName;
+    private final FeatureCategory category;
     private final boolean rendered;
-
+    //CONFIGURATIONS
+    private final FeatureConfig config;
     //RENDERED INFORMATION
+    public FeatureColour colour;
     public int width;
     public int height;
-
     //USED VARIABLES
     protected FontRenderer fontRenderer = Minecraft.getMinecraft().fontRendererObj;
     protected Minecraft mc = Minecraft.getMinecraft();
     protected Random random = new Random();
     protected Logger logger;
-
-    //CONFIGURATIONS
-    private boolean toggle;
+    private Boolean toggle;
     private FeaturePosition position;
 
-    public Feature(String name, boolean rendered) {
+    public Feature(String name, FeatureCategory category, boolean rendered) {
         this.name = name;
         this.registryName = name.toLowerCase().replaceAll(" ", "_");
+        this.category = category;
         this.rendered = rendered;
 
-        this.logger = LoggingUtils.getInstance().createLogger(name);
+        this.logger = LoggingUtils.getInstance().createLogger(Constants.NAME, name);
 
-        this.setupModule();
+        this.config = new FeatureConfig(this);
+        this.setupFeature();
     }
 
-    private void setupModule() {
+    private void setupFeature() {
         try {
-            this.getLogger().info("Setting up " + this.getName());
-            this.onSave(new JsonObject());
             this.onSetup();
+            this.onSave();
             this.onLoad();
         } catch (Exception e) {
             e.printStackTrace();
@@ -57,7 +55,6 @@ public abstract class Feature {
     }
 
     public void onSetup() {
-        FeatureUtils.getInstance().setupConfigs(this);
     }
 
     public abstract void onEnabled();
@@ -67,27 +64,33 @@ public abstract class Feature {
     public void onRendered(FeaturePosition position) {
     }
 
-    public void onSave(JsonObject object) {
-        object.put("toggle", this.isToggled());
+    public void onSave() {
+        boolean isConfigNull = JsonReader.readObj(this.getRegistryName(), SkyBlockBonus.getFileHandler().featureDir) == null;
+
+        if (this.isToggled() == null && isConfigNull) this.toggle = Boolean.FALSE;
+        else if (this.isToggled() != null) this.config.put("toggle", this.isToggled());
+
         if (this.isRendered()) {
-            JsonObject positionObject = new JsonObject();
-            positionObject
+            if (this.getRenderedPosition() == null && isConfigNull)
+                this.position = new FeaturePosition(10, 10);
+            config.put("position", new JsonObject()
                     .add("x", this.getRenderedPosition().getX())
-                    .add("y", this.getRenderedPosition().getY());
-            object.put("position", positionObject);
+                    .add("y", this.getRenderedPosition().getY()));
+            if (this.colour == null && isConfigNull)
+                this.colour = new FeatureColour(255, 255, 255, 255);
+            config.put("colour", new JsonObject()
+                    .add("r", this.colour.getR())
+                    .add("g", this.colour.getG())
+                    .add("b", this.colour.getB()));
         }
-        JsonWriter.write(this.getRegistryName(), object, SkyBlockBonus.getFileHandler().featureDir);
+        config.save();
     }
 
     public void onLoad() {
-        final JsonObject featureObj = JsonReader.readObj(this.getRegistryName(), SkyBlockBonus.getFileHandler().featureDir);
-        this.setToggleState(Boolean.parseBoolean(String.valueOf(featureObj.get("toggle"))));
+        this.setToggleState(config.get("toggle", Boolean.class));
         if (this.isRendered()) {
-            final JsonObject positionObj = (JsonObject) featureObj.get("position");
-            this.setPosition(
-                    Integer.parseInt(String.valueOf(positionObj.get("x"))),
-                    Integer.parseInt(String.valueOf(positionObj.get("y")))
-            );
+            this.setPosition(((JsonObject) config.getConfigObject().get("position")).get("x"), ((JsonObject) config.getConfigObject().get("position")).get("y"));
+            this.setColour(((JsonObject) config.getConfigObject().get("colour")).get("r"), ((JsonObject) config.getConfigObject().get("colour")).get("g"), ((JsonObject) config.getConfigObject().get("colour")).get("b"));
         }
     }
 
@@ -99,8 +102,16 @@ public abstract class Feature {
         return registryName;
     }
 
-    public boolean isToggled() {
+    public FeatureConfig getConfig() {
+        return config;
+    }
+
+    public Boolean isToggled() {
         return toggle;
+    }
+
+    public FeatureCategory getCategory() {
+        return category;
     }
 
     public boolean isRendered() {
@@ -123,9 +134,15 @@ public abstract class Feature {
         this.position = position;
     }
 
-    public void setPosition(int x, int y) {
-        this.position.setX(x);
-        this.position.setY(y);
+    public void setColour(Object r, Object g, Object b) {
+        this.colour.setR((Integer) r);
+        this.colour.setG((Integer) g);
+        this.colour.setB((Integer) b);
+    }
+
+    public void setPosition(Object x, Object y) {
+        this.position.setX((Integer) x);
+        this.position.setY((Integer) y);
     }
 
 }

@@ -1,6 +1,6 @@
 package ga.matthewtgm.skyblockmod.gui;
 
-import ga.matthewtgm.lib.gui.GuiTransButton;
+import ga.matthewtgm.lib.gui.components.GuiTransButton;
 import ga.matthewtgm.lib.util.RenderUtils;
 import ga.matthewtgm.skyblockmod.Constants;
 import ga.matthewtgm.skyblockmod.SkyBlockBonus;
@@ -98,6 +98,14 @@ public class GuiHudEditor extends GuiScreen {
     protected void mouseReleased(int mouseX, int mouseY, int state) {
         super.mouseReleased(mouseX, mouseY, state);
         this.dragging = false;
+    }
+
+    @Override
+    public void onGuiClosed() {
+        for (Feature feature : SkyBlockBonus.getInstance().getFeatureManager().getFeatures()) {
+            feature.onSave();
+            feature.onLoad();
+        }
     }
 
     protected void updateFeaturePosition(int x, int y) {

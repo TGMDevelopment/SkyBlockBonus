@@ -1,14 +1,16 @@
-package ga.matthewtgm.skyblockmod.gui;
+package ga.matthewtgm.skyblockmod.gui.features;
 
-import ga.matthewtgm.lib.gui.GuiTransButton;
+import ga.matthewtgm.lib.gui.components.GuiTransButton;
 import ga.matthewtgm.skyblockmod.Constants;
 import ga.matthewtgm.skyblockmod.SkyBlockBonus;
-import ga.matthewtgm.skyblockmod.features.Feature;
+import ga.matthewtgm.skyblockmod.features.FeatureCategory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.EnumChatFormatting;
+
+import java.util.Arrays;
 
 public class GuiFeatureConfigurations extends GuiScreen {
 
@@ -25,7 +27,7 @@ public class GuiFeatureConfigurations extends GuiScreen {
     @Override
     public void initGui() {
         this.buttonList.add(new GuiTransButton(0, this.width / 2 - 50, this.height - 20, 100, 20, (parent == null ? "Close" : "Back")));
-        this.setupElementButtons("init", null);
+        this.setupCategoryButtons("init", null);
     }
 
     @Override
@@ -33,7 +35,7 @@ public class GuiFeatureConfigurations extends GuiScreen {
         if (button.id == 0) {
             Minecraft.getMinecraft().displayGuiScreen(this.getParent());
         }
-        this.setupElementButtons("action", button);
+        this.setupCategoryButtons("action", button);
     }
 
     @Override
@@ -47,21 +49,18 @@ public class GuiFeatureConfigurations extends GuiScreen {
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
-    private void setupElementButtons(String type, GuiButton button) {
-        int offset = 20;
-        int offsetX = 0;
-        for (Feature feature : SkyBlockBonus.getInstance().getFeatureManager().getFeatures()) {
-            if (type.equalsIgnoreCase("init")) {
-                this.buttonList.add(new GuiTransButton(SkyBlockBonus.getInstance().getFeatureManager().getFeatures().indexOf(feature) + 1, offsetX, this.height - offset, 100, 20, feature.getName()));
-                offset = offset + 20;
-                if (offset > 240) {
-                    offsetX = this.width - 100;
-                    offset = 20;
+    private void setupCategoryButtons(String type, GuiButton button) {
+        int offset = this.height / 2 - 50;
+        for (FeatureCategory category : FeatureCategory.values()) {
+            if (type.equals("init")) {
+                this.buttonList.add(new GuiTransButton(Arrays.asList(FeatureCategory.values()).indexOf(category) + 1, this.width / 2 - 50, this.height - offset, 100, 20, category.getProperName()));
+                offset += 25;
+                if (offset > ((this.height / 2) / SkyBlockBonus.getInstance().getFeatureManager().getFeatures().size() * 20)) {
+                    offset = this.height / 2 - 50;
                 }
-                if (offset > SkyBlockBonus.getInstance().getFeatureManager().getFeatures().size() * 20) offset = 20;
-            } else if (type.equalsIgnoreCase("action")) {
-                if (button.id == SkyBlockBonus.getInstance().getFeatureManager().getFeatures().indexOf(feature) + 1) {
-                    Minecraft.getMinecraft().displayGuiScreen(new GuiFeature(feature, this));
+            } else if (type.equals("action")) {
+                if (button.id == Arrays.asList(FeatureCategory.values()).indexOf(category) + 1) {
+                    Minecraft.getMinecraft().displayGuiScreen(new GuiFeatureCategory(category, this));
                 }
             }
         }

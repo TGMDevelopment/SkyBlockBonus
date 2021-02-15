@@ -1,6 +1,8 @@
 package ga.matthewtgm.skyblockmod.utils;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.scoreboard.ScoreObjective;
+import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.StringUtils;
 
 public class MainUtils {
@@ -22,15 +24,19 @@ public class MainUtils {
     }
 
     public boolean isPlayerInSkyblock() {
-        boolean isInSkyblock = false;
-        if(Minecraft.getMinecraft().theWorld != null) {
-            if (Minecraft.getMinecraft().theWorld.getScoreboard().getObjectiveInDisplaySlot(1) != null) {
-                if (StringUtils.stripControlCodes(Minecraft.getMinecraft().theWorld.getScoreboard().getObjectiveInDisplaySlot(1).getDisplayName()).contains("SKYBLOCK")) {
-                    isInSkyblock = true;
+        boolean skyblock = false;
+        Minecraft mc = Minecraft.getMinecraft();
+        if(mc != null && mc.thePlayer != null && mc.theWorld != null && !mc.isSingleplayer() && isPlayerOnHypixel()) {
+            Scoreboard scoreboard = mc.theWorld.getScoreboard();
+            if(scoreboard != null) {
+                ScoreObjective objective = scoreboard.getObjectiveInDisplaySlot(1);
+                if(objective != null) {
+                    String objectiveName = StringUtils.stripControlCodes(objective.getDisplayName());
+                    if(objectiveName.equalsIgnoreCase("skyblock")) skyblock = true;
                 }
             }
         }
-        return isInSkyblock;
+        return skyblock;
     }
 
     public boolean isNull(Object obj) {

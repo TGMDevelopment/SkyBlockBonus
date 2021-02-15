@@ -13,6 +13,7 @@ public class VersionChecker {
 
     public String verJson;
     public JsonObject verOBJ;
+    private String versFileUrl = "https://raw.githubusercontent.com/TGMDevelopment/SkyBlock-Bonus-Data/main/vers.json";
     private String version;
     private String download_url;
     private boolean emergency;
@@ -20,7 +21,7 @@ public class VersionChecker {
 
     {
         try {
-            reader = new BufferedReader(new InputStreamReader(new URL("https://dl.dropboxusercontent.com/s/6545j3us2qech45/version.json").openStream()));
+            reader = new BufferedReader(new InputStreamReader(new URL(versFileUrl).openStream()));
             verJson = reader.readLine();
             verOBJ = JsonParser.parseObj(verJson);
         } catch (IOException e) {
@@ -31,7 +32,7 @@ public class VersionChecker {
     public String getVersion() {
         try {
             JsonObject obj = JsonParser.parseObj(verJson);
-            version = String.valueOf(obj.get("ver"));
+            version = String.valueOf(obj.get("latest"));
             return version;
         } catch (Exception e) {
             e.printStackTrace();
@@ -73,7 +74,7 @@ public class VersionChecker {
 
     public void reload() {
         try {
-            reader = new BufferedReader(new InputStreamReader(new URL("https://dl.dropboxusercontent.com/s/6545j3us2qech45/version.json").openStream()));
+            reader = new BufferedReader(new InputStreamReader(new URL(versFileUrl).openStream()));
             verJson = reader.readLine();
             verOBJ = JsonParser.parseObj(verJson);
         } catch (IOException e) {

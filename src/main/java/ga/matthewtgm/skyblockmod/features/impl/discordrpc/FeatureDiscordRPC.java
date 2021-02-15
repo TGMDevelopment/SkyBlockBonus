@@ -1,6 +1,7 @@
 package ga.matthewtgm.skyblockmod.features.impl.discordrpc;
 
 import ga.matthewtgm.skyblockmod.features.Feature;
+import ga.matthewtgm.skyblockmod.features.FeatureCategory;
 import ga.matthewtgm.skyblockmod.utils.ConflictingModsLoaded;
 
 import java.util.ArrayList;
@@ -8,7 +9,7 @@ import java.util.ArrayList;
 public class FeatureDiscordRPC extends Feature {
 
     public FeatureDiscordRPC() {
-        super("DiscordRPC", false);
+        super("DiscordRPC", FeatureCategory.OTHER, false);
     }
 
     @Override

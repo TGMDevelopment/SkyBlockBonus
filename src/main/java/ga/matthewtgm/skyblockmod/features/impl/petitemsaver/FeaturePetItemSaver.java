@@ -1,40 +1,26 @@
 package ga.matthewtgm.skyblockmod.features.impl.petitemsaver;
 
+import ga.matthewtgm.json.parsing.JsonParser;
 import ga.matthewtgm.skyblockmod.features.Feature;
+import ga.matthewtgm.skyblockmod.features.FeatureCategory;
 import ga.matthewtgm.skyblockmod.utils.ChatUtils;
+import ga.matthewtgm.skyblockmod.utils.ItemStackUtils;
+import ga.matthewtgm.skyblockmod.utils.WebUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.StringUtils;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class FeaturePetItemSaver extends Feature {
 
-    private final List<String> petUpgradeItemsList = Arrays.asList(
-            "all skills exp boost",
-            "mining exp boost",
-            "farming exp boost",
-            "fishing exp boost",
-            "combat exp boost",
-            "foraging exp boost",
-            "big teeth",
-            "iron claws",
-            "hardened scales",
-            "sharpened claws",
-            "bubblegum",
-            "textbook",
-            "lucky clover",
-            "saddle",
-            "tier boost",
-            "exp share"
-    );
+    private List<String> petUpgradeItemsList;
 
     public FeaturePetItemSaver() {
-        super("Pet Item Saver", false);
+        super("Pet Item Saver", FeatureCategory.OTHER, false);
+        this.petUpgradeItemsList = (List<String>) JsonParser.parseArr(WebUtils.getInstance().getJsonOnline("https://raw.githubusercontent.com/TGMDevelopment/SkyBlock-Bonus-Data/main/features/petitemsaver/petitems.json"));
     }
 
     @Override
@@ -52,14 +38,13 @@ public class FeaturePetItemSaver extends Feature {
         if (Minecraft.getMinecraft().thePlayer == null) return;
         if (event.entityPlayer != Minecraft.getMinecraft().thePlayer) return;
         final ItemStack held = event.entityPlayer.getHeldItem();
-        if(held == null) return;
-        for (String upgrade : this.petUpgradeItemsList) {
-            System.out.println(StringUtils.stripControlCodes(held.getDisplayName()).toLowerCase().contains(upgrade));
-            if (!StringUtils.stripControlCodes(held.getDisplayName()).toLowerCase().contains(upgrade)) return;
-            else {
-                event.setCanceled(true);
-                ChatUtils.getInstance().sendModMessage("A feature has stopped you from using this item!");
-            }
+        if (held == null) return;
+        for (String upgradeId : this.petUpgradeItemsList) {
+            String itemId = ItemStackUtils.getInstance().getSkyBlockId(held);
+            if (itemId == null) return;
+            if (!itemId.contains(upgradeId)) return;
+            event.setCanceled(true);
+            ChatUtils.getInstance().sendModMessage("A feature has stopped you from using this item!");
         }
     }
 

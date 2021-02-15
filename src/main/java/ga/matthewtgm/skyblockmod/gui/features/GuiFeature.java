@@ -1,7 +1,7 @@
-package ga.matthewtgm.skyblockmod.gui;
+package ga.matthewtgm.skyblockmod.gui.features;
 
-import ga.matthewtgm.json.objects.JsonObject;
-import ga.matthewtgm.lib.gui.GuiTransButton;
+import ga.matthewtgm.lib.gui.BetterGuiScreen;
+import ga.matthewtgm.lib.gui.components.GuiTransButton;
 import ga.matthewtgm.lib.util.GuiScreenUtils;
 import ga.matthewtgm.skyblockmod.features.Feature;
 import ga.matthewtgm.skyblockmod.features.FeaturePosition;
@@ -12,7 +12,7 @@ import net.minecraft.util.EnumChatFormatting;
 
 import java.io.IOException;
 
-public class GuiFeature extends GuiScreen {
+public class GuiFeature extends BetterGuiScreen {
 
     private final Feature feature;
     private final GuiScreen parent;
@@ -25,7 +25,10 @@ public class GuiFeature extends GuiScreen {
     @Override
     public void initGui() {
         this.buttonList.add(new GuiTransButton(0, this.width / 2 - 50, this.height - 20, 100, 20, this.parent == null ? "Close" : "Back"));
-        this.buttonList.add(new GuiTransButton(1, this.width / 2 - 50, this.height / 2, 100, 20, "Toggle: " + (this.feature.isToggled() ? EnumChatFormatting.GREEN + "ON" : EnumChatFormatting.RED + "OFF")));
+        this.buttonList.add(new GuiTransButton(1, this.width / 2 - 50, this.height / 2 - 50, 100, 20, "Toggle: " + (this.feature.isToggled() ? EnumChatFormatting.GREEN + "ON" : EnumChatFormatting.RED + "OFF")));
+        if(this.feature.isRendered()) {
+            this.buttonList.add(new GuiTransButton(2, this.width / 2 - 50, this.height / 2 - 20, 100, 20, "Colour"));
+        }
     }
 
     @Override
@@ -42,6 +45,9 @@ public class GuiFeature extends GuiScreen {
                 } else {
                     this.feature.onDisabled();
                 }
+                break;
+            case 2:
+                Minecraft.getMinecraft().displayGuiScreen(new GuiFeatureColour(this.getFeature(), this));
         }
     }
 
@@ -49,12 +55,12 @@ public class GuiFeature extends GuiScreen {
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawDefaultBackground();
         this.feature.onRendered(new FeaturePosition(this.width / 2, 0));
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        super.drawComponents(mouseX, mouseY);
     }
 
     @Override
     public void onGuiClosed() {
-        this.getFeature().onSave(new JsonObject());
+        this.getFeature().onSave();
         this.getFeature().onLoad();
     }
 
@@ -67,6 +73,7 @@ public class GuiFeature extends GuiScreen {
         return feature;
     }
 
+    @Override
     public GuiScreen getParent() {
         return parent;
     }

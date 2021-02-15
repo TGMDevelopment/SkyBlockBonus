@@ -1,7 +1,15 @@
 package ga.matthewtgm.skyblockmod.features;
 
+import ga.matthewtgm.skyblockmod.features.impl.FeatureTest;
 import ga.matthewtgm.skyblockmod.features.impl.discordrpc.FeatureDiscordRPC;
+import ga.matthewtgm.skyblockmod.features.impl.info.FeatureDefenseNumber;
+import ga.matthewtgm.skyblockmod.features.impl.info.FeatureHealthNumber;
+import ga.matthewtgm.skyblockmod.features.impl.info.FeatureManaNumber;
+import ga.matthewtgm.skyblockmod.features.impl.other.FeatureDisableEmberRod;
+import ga.matthewtgm.skyblockmod.features.impl.other.FeatureLockSlots;
+import ga.matthewtgm.skyblockmod.features.impl.petitemsaver.FeaturePetItemSaver;
 import ga.matthewtgm.skyblockmod.features.impl.playerhider.FeaturePlayerHider;
+import ga.matthewtgm.skyblockmod.features.impl.raredropmessage.FeatureRareDropMessage;
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -14,9 +22,19 @@ public class FeatureManager {
     protected final List<Feature> features = new ArrayList<>();
 
     public void initFeatures() {
+        //this.getFeatures().add(new FeatureTest());
+
         this.getFeatures().add(new FeatureDiscordRPC());
         this.getFeatures().add(new FeaturePlayerHider());
-        //this.getFeatures().add(new FeaturePetItemSaver());
+        this.getFeatures().add(new FeaturePetItemSaver());
+        this.getFeatures().add(new FeatureRareDropMessage());
+        this.getFeatures().add(new FeatureDisableEmberRod());
+
+        //TODO: this.getFeatures().add(new FeatureLockSlots());
+
+        //this.getFeatures().add(new FeatureHealthNumber());
+        //this.getFeatures().add(new FeatureManaNumber());
+        //this.getFeatures().add(new FeatureDefenseNumber());
 
         this.getFeatures().forEach(feature -> {
             if (feature.isToggled()) {

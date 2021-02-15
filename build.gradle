@@ -19,7 +19,7 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-version = "0.1"
+version = "0.0.1"
 group = "ga.matthewtgm.skyblockmod"
 archivesBaseName = "SkyBlockBonus"
 
@@ -43,7 +43,7 @@ dependencies {
     }
     compile('com.jagrosh:DiscordIPC:0.4')
     compile('com.github.TGMDevelopment:JsonTGM:0.2.3')
-    compile('com.github.TGMDevelopment:TGMLib:0.7.3')
+    compile('com.github.TGMDevelopment:TGMLib:0.7.5')
     provided(files('libs/modcore.jar'))
 }
 
@@ -52,7 +52,7 @@ shadowJar {
         include(dependency('org.spongepowered:mixin:0.7.11-SNAPSHOT'))
         include(dependency('com.jagrosh:DiscordIPC:0.4'))
         include(dependency('com.github.TGMDevelopment:JsonTGM:0.2.3'))
-        include(dependency('com.github.TGMDevelopment:TGMLib:0.7.3'))
+        include(dependency('com.github.TGMDevelopment:TGMLib:0.7.5'))
     }
 
     exclude('modcore.jar')

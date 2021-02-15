@@ -1,8 +1,9 @@
 package ga.matthewtgm.skyblockmod.gui;
 
-import ga.matthewtgm.lib.gui.GuiTransButton;
-import ga.matthewtgm.lib.gui.GuiTransImageButton;
+import ga.matthewtgm.lib.gui.components.GuiTransButton;
+import ga.matthewtgm.lib.gui.components.GuiTransImageButton;
 import ga.matthewtgm.skyblockmod.Constants;
+import ga.matthewtgm.skyblockmod.gui.features.GuiFeatureConfigurations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
