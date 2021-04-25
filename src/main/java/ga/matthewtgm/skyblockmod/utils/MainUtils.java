@@ -1,9 +1,13 @@
 package ga.matthewtgm.skyblockmod.utils;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
+import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.StringUtils;
+
+import java.util.Collection;
 
 public class MainUtils {
 
@@ -37,6 +41,23 @@ public class MainUtils {
             }
         }
         return skyblock;
+    }
+
+    public boolean isPlayerInDungeon() {
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc != null && mc.thePlayer != null && mc.theWorld != null) {
+            Scoreboard scoreboard = mc.theWorld.getScoreboard();
+            if (scoreboard != null) {
+                Collection<Score> scores = scoreboard.getSortedScores(scoreboard.getObjectiveInDisplaySlot(1));
+                for (Score line : scores) {
+                    ScorePlayerTeam scorePlayerTeam = scoreboard.getPlayersTeam(line.getPlayerName());
+                    String strippedLine = TextUtils.keepScoreboardCharacters(StringUtils.stripControlCodes(ScorePlayerTeam.formatPlayerName(scorePlayerTeam, line.getPlayerName()))).trim();
+
+                    return strippedLine.contains("Dungeon Cleared: ");
+                }
+            }
+        }
+        return false;
     }
 
     public boolean isNull(Object obj) {

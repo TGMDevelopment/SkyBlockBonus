@@ -7,10 +7,10 @@ public class FeatureColour {
     private int r, g, b, a;
     private int rgba;
 
-    public FeatureColour(int r, int b, int g, int a) {
+    public FeatureColour(int r, int g, int b, int a) {
         this.r = r;
-        this.b = b;
         this.g = g;
+        this.b = b;
         this.a = a;
     }
 

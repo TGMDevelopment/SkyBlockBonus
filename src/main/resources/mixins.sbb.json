@@ -6,10 +6,28 @@
   "refmap": "mixins.sbb.refmap.json",
   "mixins": [
     "client.MinecraftMixin",
-    "networking.NetworkManagerMixin"
+    "networking.NetworkManagerMixin",
+    "gui.GuiContainerMixin",
+    "gui.GuiContainerAccessor",
+    "rendering.RenderLivingEntityMixin",
+    "rendering.EntityRendererMixin",
+    "rendering.RenderMixin",
+    "rendering.ImageBufferDownloadMixin",
+    "entity.EntityPlayerSPMixin",
+    "items.ItemBucketMixin",
+    "particles.EffectRendererMixin"
   ],
   "client": [
     "client.MinecraftMixin",
-    "networking.NetworkManagerMixin"
+    "networking.NetworkManagerMixin",
+    "gui.GuiContainerMixin",
+    "gui.GuiContainerAccessor",
+    "rendering.RenderLivingEntityMixin",
+    "rendering.EntityRendererMixin",
+    "rendering.RenderMixin",
+    "rendering.ImageBufferDownloadMixin",
+    "entity.EntityPlayerSPMixin",
+    "items.ItemBucketMixin",
+    "particles.EffectRendererMixin"
   ]
 }

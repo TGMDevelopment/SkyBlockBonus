@@ -26,4 +26,15 @@ public class ItemStackUtils {
         return null;
     }
 
+    public boolean hasSkyBlockId(ItemStack is) {
+        if (is == null) throw new NullPointerException("The ItemStack passed cannot be null.");
+        if (!is.hasTagCompound()) return false;
+        NBTTagCompound ExtraAttributes = is.getTagCompound().getCompoundTag("ExtraAttributes");
+        if (ExtraAttributes != null) {
+            String skyblockId = ExtraAttributes.getString("id");
+            return !skyblockId.isEmpty();
+        }
+        return false;
+    }
+
 }

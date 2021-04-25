@@ -1,9 +1,12 @@
 package ga.matthewtgm.skyblockmod.utils;
 
 import ga.matthewtgm.skyblockmod.Constants;
+import ga.matthewtgm.skyblockmod.events.ModChatMessageSentEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumChatFormatting;
+import net.minecraftforge.client.event.ClientChatReceivedEvent;
+import net.minecraftforge.common.MinecraftForge;
 
 public class ChatUtils {
 
@@ -16,24 +19,33 @@ public class ChatUtils {
         return INSTANCE;
     }
 
-    public void sendMessage(String msg) {
+    public void sendMessage(ModChatMessageSentEvent.Type type, String msg) {
         if (msg == null) return;
         if (Minecraft.getMinecraft().thePlayer == null) return;
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(msg));
+        ModChatMessageSentEvent event = new ModChatMessageSentEvent(type, new ChatComponentText(msg));
+        MinecraftForge.EVENT_BUS.post(event);
+        if (!event.isCanceled())
+            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(msg));
     }
 
-    public void sendModMessage(String msg) {
+    public void sendModMessage(ModChatMessageSentEvent.Type type, String msg) {
         if (msg == null) return;
         if (Minecraft.getMinecraft().thePlayer == null) return;
-        Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(prefix + EnumChatFormatting.RESET + " " + msg));
+        ModChatMessageSentEvent event = new ModChatMessageSentEvent(type, new ChatComponentText(prefix + EnumChatFormatting.RESET + " " + msg));
+        MinecraftForge.EVENT_BUS.post(event);
+        if (!event.isCanceled())
+            Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(prefix + EnumChatFormatting.RESET + " " + msg));
     }
 
-    public void sendModMessage(ChatComponentText text) {
+    public void sendModMessage(ModChatMessageSentEvent.Type type, ChatComponentText text) {
         if (text == null) return;
         if (Minecraft.getMinecraft().thePlayer == null) return;
         ChatComponentText chatComponent = new ChatComponentText(prefix + EnumChatFormatting.RESET + " ");
         chatComponent.appendSibling(text);
-        Minecraft.getMinecraft().thePlayer.addChatMessage(chatComponent);
+        ModChatMessageSentEvent event = new ModChatMessageSentEvent(type, chatComponent);
+        MinecraftForge.EVENT_BUS.post(event);
+        if (!event.isCanceled())
+            Minecraft.getMinecraft().thePlayer.addChatMessage(chatComponent);
     }
 
     public String getPrefix() {

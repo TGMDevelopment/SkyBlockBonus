@@ -1,11 +1,13 @@
 package ga.matthewtgm.skyblockmod.utils;
 
+import ga.matthewtgm.skyblockmod.events.GetLocationEvent;
 import ga.matthewtgm.skyblockmod.skyblock.EnumLocation;
 import net.minecraft.client.Minecraft;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.util.StringUtils;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
@@ -17,11 +19,15 @@ public class LocationListener {
     private EnumLocation location = EnumLocation.UNKNOWN;
 
     @SubscribeEvent
-    protected void onClickTick(TickEvent.ClientTickEvent event) {
+    protected void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase == TickEvent.Phase.START) {
             tickTimer++;
             if (tickTimer % 15 == 0) {
-                this.checkLocation();
+                GetLocationEvent event1 = new GetLocationEvent(location);
+                if (!event1.isCanceled()) {
+                    this.checkLocation();
+                    MinecraftForge.EVENT_BUS.post(event1);
+                }
             }
         }
     }

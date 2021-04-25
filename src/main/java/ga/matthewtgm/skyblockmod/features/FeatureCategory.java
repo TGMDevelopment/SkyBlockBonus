@@ -3,10 +3,12 @@ package ga.matthewtgm.skyblockmod.features;
 public enum FeatureCategory {
 
     CHAT("Chat"),
+    GUI("Gui"),
     RENDERING("Rendering"),
     OVERLAY("Overlay"),
     DUNGEONS("Dungeons"),
-    MAYOR("Mayor"),
+    TRACKING("Tracking"),
+    COSMETICS("Cosmetics"),
     OTHER("Other");
 
     private final String properName;

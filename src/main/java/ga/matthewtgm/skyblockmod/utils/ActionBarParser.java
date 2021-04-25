@@ -1,7 +1,5 @@
 package ga.matthewtgm.skyblockmod.utils;
 
-import java.util.Arrays;
-
 public class ActionBarParser {
 
     private String health;

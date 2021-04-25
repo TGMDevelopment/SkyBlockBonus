@@ -1,14 +1,19 @@
 package ga.matthewtgm.skyblockmod.features;
 
+import com.google.gson.internal.LinkedTreeMap;
 import ga.matthewtgm.json.files.JsonReader;
 import ga.matthewtgm.json.objects.JsonObject;
+import ga.matthewtgm.json.parsing.JsonParser;
 import ga.matthewtgm.lib.util.LoggingUtils;
 import ga.matthewtgm.skyblockmod.Constants;
 import ga.matthewtgm.skyblockmod.SkyBlockBonus;
+import ga.matthewtgm.skyblockmod.runnables.GuiButtonRunnable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import org.apache.logging.log4j.Logger;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public abstract class Feature {
@@ -18,8 +23,10 @@ public abstract class Feature {
     private final String registryName;
     private final FeatureCategory category;
     private final boolean rendered;
+
     //CONFIGURATIONS
     private final FeatureConfig config;
+    private final List<GuiButtonRunnable> additionalConfigButtons = new ArrayList<>();
     //RENDERED INFORMATION
     public FeatureColour colour;
     public int width;
@@ -71,14 +78,12 @@ public abstract class Feature {
         else if (this.isToggled() != null) this.config.put("toggle", this.isToggled());
 
         if (this.isRendered()) {
-            if (this.getRenderedPosition() == null && isConfigNull)
-                this.position = new FeaturePosition(10, 10);
-            config.put("position", new JsonObject()
-                    .add("x", this.getRenderedPosition().getX())
-                    .add("y", this.getRenderedPosition().getY()));
-            if (this.colour == null && isConfigNull)
-                this.colour = new FeatureColour(255, 255, 255, 255);
-            config.put("colour", new JsonObject()
+            if (this.position == null && isConfigNull) this.position = new FeaturePosition(10, 10);
+            else if (this.position != null) config.put("position", new JsonObject()
+                    .add("x", this.position.getX())
+                    .add("y", this.position.getY()));
+            if (this.colour == null && isConfigNull) this.colour = new FeatureColour(255, 255, 255, 255);
+            else if (this.colour != null) config.put("colour", new JsonObject()
                     .add("r", this.colour.getR())
                     .add("g", this.colour.getG())
                     .add("b", this.colour.getB()));
@@ -89,8 +94,10 @@ public abstract class Feature {
     public void onLoad() {
         this.setToggleState(config.get("toggle", Boolean.class));
         if (this.isRendered()) {
-            this.setPosition(((JsonObject) config.getConfigObject().get("position")).get("x"), ((JsonObject) config.getConfigObject().get("position")).get("y"));
-            this.setColour(((JsonObject) config.getConfigObject().get("colour")).get("r"), ((JsonObject) config.getConfigObject().get("colour")).get("g"), ((JsonObject) config.getConfigObject().get("colour")).get("b"));
+            final JsonObject position = JsonParser.parseObj(config.get("position", LinkedTreeMap.class).toString());
+            final JsonObject colour = JsonParser.parseObj(config.get("colour", LinkedTreeMap.class).toString());
+            this.setPosition(position.get("x"), position.get("y"));
+            this.setColour(colour.get("r"), colour.get("g"), colour.get("b"));
         }
     }
 
@@ -104,6 +111,10 @@ public abstract class Feature {
 
     public FeatureConfig getConfig() {
         return config;
+    }
+
+    public List<GuiButtonRunnable> getAdditionalConfigButtons() {
+        return additionalConfigButtons;
     }
 
     public Boolean isToggled() {
@@ -135,14 +146,11 @@ public abstract class Feature {
     }
 
     public void setColour(Object r, Object g, Object b) {
-        this.colour.setR((Integer) r);
-        this.colour.setG((Integer) g);
-        this.colour.setB((Integer) b);
+        this.colour = new FeatureColour((int) Math.round((Double) r), (int) Math.round((Double) g), (int) Math.round((Double) b), 255);
     }
 
     public void setPosition(Object x, Object y) {
-        this.position.setX((Integer) x);
-        this.position.setY((Integer) y);
+        this.position = new FeaturePosition((int) Math.round((Double) x), (int) Math.round((Double) y));
     }
 
 }

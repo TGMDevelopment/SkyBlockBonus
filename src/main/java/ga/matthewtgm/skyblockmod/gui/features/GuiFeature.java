@@ -5,6 +5,7 @@ import ga.matthewtgm.lib.gui.components.GuiTransButton;
 import ga.matthewtgm.lib.util.GuiScreenUtils;
 import ga.matthewtgm.skyblockmod.features.Feature;
 import ga.matthewtgm.skyblockmod.features.FeaturePosition;
+import ga.matthewtgm.skyblockmod.runnables.GuiButtonRunnable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -24,11 +25,14 @@ public class GuiFeature extends BetterGuiScreen {
 
     @Override
     public void initGui() {
-        this.buttonList.add(new GuiTransButton(0, this.width / 2 - 50, this.height - 20, 100, 20, this.parent == null ? "Close" : "Back"));
-        this.buttonList.add(new GuiTransButton(1, this.width / 2 - 50, this.height / 2 - 50, 100, 20, "Toggle: " + (this.feature.isToggled() ? EnumChatFormatting.GREEN + "ON" : EnumChatFormatting.RED + "OFF")));
+        buttonList.add(new GuiTransButton(0, width / 2 - 50, height - 20, 100, 20, parent == null ? "Close" : "Back"));
+        buttonList.add(new GuiTransButton(1, width / 2 - 50, height / 2 - 50, 100, 20, "Toggle: " + (feature.isToggled() ? EnumChatFormatting.GREEN + "ON" : EnumChatFormatting.RED + "OFF")));
         if(this.feature.isRendered()) {
-            this.buttonList.add(new GuiTransButton(2, this.width / 2 - 50, this.height / 2 - 20, 100, 20, "Colour"));
+            buttonList.add(new GuiTransButton(2, this.width / 2 - 50, this.height / 2 - 20, 100, 20, "Colour"));
         }
+
+        for (GuiButtonRunnable runnable : this.feature.getAdditionalConfigButtons())
+            buttonList.add(new GuiTransButton(runnable.getId(), runnable.getX(), runnable.getY(), runnable.getWidth(), runnable.getHeight(), runnable.getText()));
     }
 
     @Override
@@ -38,30 +42,32 @@ public class GuiFeature extends BetterGuiScreen {
                 Minecraft.getMinecraft().displayGuiScreen(this.getParent());
                 break;
             case 1:
-                this.feature.setToggleState(!this.feature.isToggled());
-                GuiScreenUtils.getInstance().fixDisplayText(button, "Toggle: " + (this.feature.isToggled() ? EnumChatFormatting.GREEN + "ON" : EnumChatFormatting.RED + "OFF"));
-                if (this.feature.isToggled()) {
-                    this.feature.onEnabled();
+                feature.setToggleState(!feature.isToggled());
+                GuiScreenUtils.getInstance().fixDisplayText(button, "Toggle: " + (feature.isToggled() ? EnumChatFormatting.GREEN + "ON" : EnumChatFormatting.RED + "OFF"));
+                if (feature.isToggled()) {
+                    feature.onEnabled();
                 } else {
-                    this.feature.onDisabled();
+                    feature.onDisabled();
                 }
                 break;
             case 2:
                 Minecraft.getMinecraft().displayGuiScreen(new GuiFeatureColour(this.getFeature(), this));
         }
+        for (GuiButtonRunnable runnable : feature.getAdditionalConfigButtons())
+            if (button.id == runnable.getId()) runnable.onActionPerformed();
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         super.drawDefaultBackground();
-        this.feature.onRendered(new FeaturePosition(this.width / 2, 0));
+        feature.onRendered(new FeaturePosition(this.width / 2, 0));
         super.drawComponents(mouseX, mouseY);
     }
 
     @Override
     public void onGuiClosed() {
-        this.getFeature().onSave();
-        this.getFeature().onLoad();
+        getFeature().onSave();
+        getFeature().onLoad();
     }
 
     @Override

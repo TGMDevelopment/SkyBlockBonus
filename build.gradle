@@ -19,11 +19,18 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-version = "0.0.1"
-group = "ga.matthewtgm.skyblockmod"
-archivesBaseName = "SkyBlockBonus"
+version = project.mod_version
+group = project.mod_group
+archivesBaseName = project.mod_name
 
 sourceCompatibility = targetCompatibility = 1.8
+
+CustomDep[] deps = [
+    new CustomDep("com.github.TGMDevelopment:SkyBlock-Bonus-API:0.1.2", true),
+    new CustomDep("com.jagrosh:DiscordIPC:0.4", true),
+    new CustomDep("com.github.TGMDevelopment:JsonTGM:0.2.8", true),
+    new CustomDep("com.github.TGMDevelopment:TGMLib:0.7.7.5", true)
+]
 
 minecraft {
     version = "1.8.9-11.15.1.2318-1.8.9"
@@ -32,6 +39,7 @@ minecraft {
     replace("@VER@": project.version)
 
     mappings = "stable_22"
+    clientJvmArgs += "-Dfml.coreMods.load=ga.matthewtgm.skyblockmod.mixins.SkyBlockModTweaker"
 }
 
 dependencies {
@@ -41,25 +49,27 @@ dependencies {
         exclude module: 'gson'
         exclude module: 'commons-io'
     }
-    compile('com.jagrosh:DiscordIPC:0.4')
-    compile('com.github.TGMDevelopment:JsonTGM:0.2.3')
-    compile('com.github.TGMDevelopment:TGMLib:0.7.5')
-    provided(files('libs/modcore.jar'))
+	annotationProcessor('org.spongepowered:mixin:0.7.11-SNAPSHOT')
+
+    compileOnly('org.projectlombok:lombok:1.18.16')
+    annotationProcessor('org.projectlombok:lombok:1.18.16')
+
+    for (CustomDep dep : deps)
+        compile(dep.name)
 }
 
 shadowJar {
     dependencies {
         include(dependency('org.spongepowered:mixin:0.7.11-SNAPSHOT'))
-        include(dependency('com.jagrosh:DiscordIPC:0.4'))
-        include(dependency('com.github.TGMDevelopment:JsonTGM:0.2.3'))
-        include(dependency('com.github.TGMDevelopment:TGMLib:0.7.5'))
+        for (CustomDep dep : deps)
+            if (dep.embed)
+                include(dependency(dep.name))
     }
 
-    exclude('modcore.jar')
     exclude('LICENSE.txt')
     exclude('dummyThing')
 
-    classifier = "working"
+    classifier = project.mod_mixins_classifier
 }
 
 repositories {
@@ -87,7 +97,7 @@ jar {
     manifest.attributes(
             'TweakClass': 'org.spongepowered.asm.launch.MixinTweaker',
             'MixinConfigs': 'mixins.sbb.json',
-            'FMLCorePlugin': 'ga.matthewtgm.skyblockmod.mixins.SkyBlockModLoadingPlugin',
+            'FMLCorePlugin': 'ga.matthewtgm.skyblockmod.mixins.SkyBlockModTweaker',
             'FMLCorePluginContainsFMLMod': true,
             'ForceLoadAsMod': true
     )
@@ -128,3 +138,12 @@ processResources
 tasks.reobfJar.dependsOn(tasks.shadowJar)
 tasks.runClient.dependsOn(tasks.build)
 tasks.runClient.dependsOn(runClientFix)
+
+class CustomDep {
+    final String name
+    final boolean embed
+    CustomDep(String name, boolean embed) {
+        this.name = name
+        this.embed = embed
+    }
+}

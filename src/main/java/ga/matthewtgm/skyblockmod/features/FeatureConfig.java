@@ -1,6 +1,5 @@
 package ga.matthewtgm.skyblockmod.features;
 
-import com.google.gson.internal.LinkedTreeMap;
 import ga.matthewtgm.json.files.JsonReader;
 import ga.matthewtgm.json.files.JsonWriter;
 import ga.matthewtgm.json.objects.JsonArray;
@@ -17,6 +16,7 @@ public class FeatureConfig {
 
         if(JsonReader.readObj(feature.getRegistryName(), SkyBlockBonus.getFileHandler().featureDir) == null) this.configObject = new JsonObject();
         else this.configObject = JsonReader.readObj(feature.getRegistryName(), SkyBlockBonus.getFileHandler().featureDir);
+        //System.out.println("Feature: " + feature.getRegistryName() + "\n" + configObject);
     }
 
     public FeatureConfig put(String key, Object value) {
@@ -26,6 +26,7 @@ public class FeatureConfig {
 
 
     public <T> T get(String key, Class<?> type) {
+        //System.out.println("FeatureConfig#get\n" + "Feature: " + this.feature.getRegistryName() + "\nKey: " + key + "\nType: " + type);
         if (!this.configObject.containsKey(key)) {
             Object newVal = new Object();
             if (type.isAssignableFrom(Boolean.class)) newVal = Boolean.FALSE;
@@ -39,11 +40,13 @@ public class FeatureConfig {
             if (type.isAssignableFrom(JsonObject.class)) newVal = new JsonObject();
             if (type.isAssignableFrom(JsonArray.class)) newVal = new JsonArray();
             this.configObject.put(key, newVal);
+            this.save();
         }
         return (T) this.configObject.get(key);
     }
 
     public void save() {
+        //System.out.println("Feature: " + feature.getRegistryName() + "\n" + configObject);
         JsonWriter.write(feature.getRegistryName(), this.configObject, SkyBlockBonus.getFileHandler().featureDir);
     }
 

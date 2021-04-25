@@ -1,6 +1,6 @@
 package ga.matthewtgm.skyblockmod.listeners.impl;
 
-import club.sk1er.mods.core.util.Multithreading;
+import ga.matthewtgm.lib.util.threading.ThreadUtils;
 import ga.matthewtgm.skyblockmod.Constants;
 import ga.matthewtgm.skyblockmod.SkyBlockBonus;
 import ga.matthewtgm.skyblockmod.events.SkyBlockJoinedEvent;
@@ -8,7 +8,9 @@ import ga.matthewtgm.skyblockmod.events.SkyBlockLeftEvent;
 import ga.matthewtgm.skyblockmod.listeners.SkyBlockModListener;
 import ga.matthewtgm.skyblockmod.utils.ActionBarParser;
 import ga.matthewtgm.skyblockmod.utils.MainUtils;
+import ga.matthewtgm.skyblockmod.utils.NPCUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.event.ClickEvent;
 import net.minecraft.util.ChatComponentText;
@@ -16,6 +18,7 @@ import net.minecraft.util.EnumChatFormatting;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent;
@@ -24,9 +27,14 @@ import org.apache.logging.log4j.Logger;
 
 public class PlayerListener extends SkyBlockModListener {
 
-    private final ActionBarParser actionBarParser = new ActionBarParser();
+    private static PlayerListener INSTANCE;
 
-    private final double sinceLastIceSprayUse = 0.1;
+    public static PlayerListener getInstance() {
+        if (INSTANCE == null)
+            INSTANCE = new PlayerListener();
+        return INSTANCE;
+    }
+
     private boolean hasCheckedForUpdate = false;
 
     public void setHasCheckedForUpdate(boolean hasCheckedForUpdate) {
@@ -41,11 +49,6 @@ public class PlayerListener extends SkyBlockModListener {
             MinecraftForge.EVENT_BUS.post(new SkyBlockJoinedEvent());
             logger.info("The player has joined SkyBlock!");
         }
-
-        if(event.type == 2) {
-            String rest = SkyBlockBonus.getInstance().getActionBarParser().parse(event.message.getUnformattedText());
-            if(rest.trim().length() == 0) event.setCanceled(true);
-        }
     }
 
     @SubscribeEvent
@@ -59,6 +62,19 @@ public class PlayerListener extends SkyBlockModListener {
     }
 
     @SubscribeEvent
+    protected void onLivingUpdate(LivingEvent.LivingUpdateEvent event) {
+        if (!MainUtils.getInstance().isPlayerInSkyblock()) return;
+        if (event.entity instanceof EntityOtherPlayerMP) {
+            float health = ((EntityOtherPlayerMP) event.entity).getHealth();
+            if (NPCUtils.npcLocations.containsKey(event.entity.getUniqueID())) {
+                if (health != 20.0f) NPCUtils.npcLocations.remove(event.entity.getUniqueID());
+            } else if (NPCUtils.isNPC(event.entity)) {
+                NPCUtils.npcLocations.put(event.entity.getUniqueID(), event.entity.getPositionVector());
+            }
+        }
+    }
+
+    @SubscribeEvent
     public void onInteract(PlayerInteractEvent event) {
 
     }
@@ -67,7 +83,7 @@ public class PlayerListener extends SkyBlockModListener {
     public void onJoin(EntityJoinWorldEvent event) {
         if (!hasCheckedForUpdate) {
             this.setHasCheckedForUpdate(true);
-            Multithreading.runAsync(() -> {
+            ThreadUtils.getInstance().runAsync(() -> {
                 EntityPlayerSP player;
                 if (Constants.VER.equals(SkyBlockBonus.getInstance().VERSION_CHECKER.getVersion())) {
                     //Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(EnumChatFormatting.YELLOW + "You have the latest version of " + EnumChatFormatting.GREEN + Constants.NAME + EnumChatFormatting.YELLOW + "!"));

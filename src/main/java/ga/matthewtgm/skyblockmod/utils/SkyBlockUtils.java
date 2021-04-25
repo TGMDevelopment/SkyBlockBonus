@@ -1,7 +1,6 @@
 package ga.matthewtgm.skyblockmod.utils;
 
 import ga.matthewtgm.skyblockmod.events.ProfileChangedEvent;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.StringUtils;
 import net.minecraftforge.client.event.ClientChatReceivedEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -11,7 +10,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SkyBlockUtils {
-
 
     private String profileName = "Unknown";
 

@@ -55,7 +55,7 @@ public class GuiFeatureConfigurations extends GuiScreen {
             if (type.equals("init")) {
                 this.buttonList.add(new GuiTransButton(Arrays.asList(FeatureCategory.values()).indexOf(category) + 1, this.width / 2 - 50, this.height - offset, 100, 20, category.getProperName()));
                 offset += 25;
-                if (offset > ((this.height / 2) / SkyBlockBonus.getInstance().getFeatureManager().getFeatures().size() * 20)) {
+                if (offset > ((this.height / 2) / Arrays.asList(FeatureCategory.values()).size() * 20)) {
                     offset = this.height / 2 - 50;
                 }
             } else if (type.equals("action")) {
